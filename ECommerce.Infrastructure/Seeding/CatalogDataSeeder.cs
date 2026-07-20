@@ -18,10 +18,16 @@ namespace ECommerce.Infrastructure.Seeding
         {
             try
             {
+                var PendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(ct);
+                if (PendingMigrations.Any()) 
+                    await dbContext.Database.MigrateAsync(ct);
+
                 var seedPath = Path.Combine(AppContext.BaseDirectory, "DataSeed");
-                await SeedIfEmptyAsync<ProductsBrand>(seedPath, "brand.josn", ct);
-                await SeedIfEmptyAsync<ProductsType>(seedPath, "types.josn", ct);
-                await SeedIfEmptyAsync<Product>(seedPath, "products.josn", ct);
+                await SeedIfEmptyAsync<ProductsBrand>(seedPath, "brands.json", ct);
+                await SeedIfEmptyAsync<ProductsType>(seedPath, "types.json", ct);
+                await SeedIfEmptyAsync<Product>(seedPath, "products.json", ct);
+
+                
             }
             catch(Exception ex) 
             {
@@ -45,8 +51,12 @@ namespace ECommerce.Infrastructure.Seeding
             var items = await JsonSerializer.DeserializeAsync<List<T>>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }, ct);
             if(items?.Count > 0) 
                 await dbContext.Set<T>().AddRangeAsync(items,ct);
+            var result = await dbContext.SaveChangesAsync(ct);
+            if (result > 0)
+                logger.LogInformation($"{result} Rows Added");
+            else
+                logger.LogInformation("Database Already Seeded");
 
-            await dbContext.SaveChangesAsync(ct);
         }
     }
 }
