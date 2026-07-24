@@ -1,10 +1,12 @@
 
 using ECommerce.API.Extentions;
 using ECommerce.Application;
+using ECommerce.Application.Profiles;
 using ECommerce.Infrastructure;
 using ECommerce.Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Threading.Tasks;
 
 namespace ECommerce.API
@@ -20,6 +22,8 @@ namespace ECommerce.API
             builder.Services.AddInfrastuctureServices(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddApplicationServices();
+
+            builder.Services.Configure<UrlSettings>(builder.Configuration.GetSection(nameof(UrlSettings)));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 
@@ -34,6 +38,11 @@ namespace ECommerce.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Files")),
+                RequestPath = "/Files"
+            });
 
             app.UseHttpsRedirection();
 

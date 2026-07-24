@@ -18,6 +18,7 @@ namespace ECommerce.Infrastructure.Seeding
         {
             try
             {
+
                 var PendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(ct);
                 if (PendingMigrations.Any()) 
                     await dbContext.Database.MigrateAsync(ct);
