@@ -24,6 +24,8 @@ namespace ECommerce.Application.Specifications
                 case ProductSortingOptions.PriceDesc: AddOrderByDesc(p => p.Price); break;
                 _: AddOrderBy(p => p.Name); break;
             }
+
+            ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
 
         public ProductSpecifications(int id) : base(p => p.Id == id)
